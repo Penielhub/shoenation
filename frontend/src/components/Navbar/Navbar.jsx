@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import logo from "../../assets/logo.svg"
 import Box from "@mui/material/Box"
 import { Height } from "@mui/icons-material";
+import {Link }from "react-router-dom"
 function Navbar() {
   return (
     <AppBar
@@ -27,10 +28,10 @@ function Navbar() {
           width:50, height:"auto",
         }}></Box>
         <nav style={{display:"flex", gap:"10px"}}>
-          <Button >SALE</Button>
-          <Button >Men</Button>
-          <Button>Women</Button>
-          <Button>Kids</Button>
+          <Button component={Link} to="/underconstruction">SALE</Button>
+          <Button component={Link} to="/underconstruction">Men</Button>
+          <Button component={Link} to="/underconstruction">Women</Button>
+          <Button component={Link} to="/underconstruction">Kids</Button>
         </nav>
       </Toolbar>
     </AppBar>

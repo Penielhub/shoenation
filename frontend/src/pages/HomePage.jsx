@@ -4,6 +4,7 @@ import heroimg from "../assets/hero.jpg";
 import decor from "../assets/decor.svg";
 import AnnouncementBanner from "../components/AnnouncementBanner/AnnouncementBanner";
 import Footer from "../components/Footer/Footer";
+
 function HomePage() {
   return (
     <>
