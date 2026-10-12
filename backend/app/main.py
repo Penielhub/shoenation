@@ -1,10 +1,8 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
 
-from . import models
-from .database import Base, engine, get_db
-from .routers import auth, users
+from .database import Base, engine
+from .routers import auth, products, users
 
 # creates any missing tables on startup. It never changes existing tables, so a new column needs an ALTER TABLE.
 Base.metadata.create_all(bind=engine)
@@ -21,8 +19,4 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(users.router)
-
-
-@app.get("/products")
-def get_products(db: Session = Depends(get_db)):
-    return db.query(models.Product).all()
+app.include_router(products.router)
