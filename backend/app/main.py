@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from . import models
 from .database import Base, engine, get_db
+from .routers import auth, users
 
 # creates any missing tables on startup. It never changes existing tables, so a new column needs an ALTER TABLE.
 Base.metadata.create_all(bind=engine)
@@ -17,6 +18,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth.router)
+app.include_router(users.router)
 
 
 @app.get("/products")
