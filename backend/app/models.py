@@ -1,7 +1,8 @@
+import enum
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import DateTime, ForeignKey, Numeric, String, Text, UniqueConstraint, func
+from sqlalchemy import DateTime, Enum, ForeignKey, Numeric, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
@@ -36,12 +37,23 @@ class ProductVariant(Base):
     product: Mapped[Product] = relationship(back_populates="variants")
 
 
+class Role(str, enum.Enum):
+    ADMIN = "admin"
+    USER = "user"
+
+
 class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255))
+    # stored as plain VARCHAR ("admin" / "user") so adding a role later needs no DB enum migration
+    role: Mapped[Role] = mapped_column(
+        Enum(Role, native_enum=False, length=20, values_callable=lambda e: [r.value for r in e]),
+        default=Role.USER,
+        server_default=Role.USER.value,
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     orders: Mapped[list["Order"]] = relationship(back_populates="user")
