@@ -1,12 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import Base, engine
 from .routers import auth, products, users
 
-# creates any missing tables on startup. It never changes existing tables, so a new column needs an ALTER TABLE.
-Base.metadata.create_all(bind=engine)
-
+# tables are created and changed by Alembic migrations, not here: run `alembic upgrade head`
 app = FastAPI()
 
 # lets frontend talk to backend

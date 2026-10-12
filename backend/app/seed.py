@@ -1,7 +1,7 @@
-"""Run from backend/:  python -m app.seed"""
+"""Run from backend/: first `alembic upgrade head`, then `python -m app.seed`"""
 import os
 
-from .database import Base, SessionLocal, engine
+from .database import SessionLocal
 from .models import Product, ProductVariant, Role, User
 from .security import hash_password
 
@@ -48,7 +48,6 @@ def seed_admin(db):
 
 
 def seed():
-    Base.metadata.create_all(bind=engine)
     with SessionLocal() as db:
         seed_products(db)
         seed_admin(db)
