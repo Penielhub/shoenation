@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
-from .models import Role
+from .models import OrderStatus, Role
 
 
 class UserCreate(BaseModel):
@@ -110,6 +110,73 @@ class ProductOut(BaseModel):
 
 class ProductPage(BaseModel):
     items: list[ProductOut]
+    total: int
+    limit: int
+    offset: int
+
+
+class OrderItemIn(BaseModel):
+    variant_id: int
+    quantity: int = Field(ge=1, le=20)
+
+
+class OrderCreate(BaseModel):
+    """Prices aren't sent: the server looks them up, so a client can't choose its own price."""
+
+    items: list[OrderItemIn] = Field(min_length=1, max_length=50)
+
+
+class OrderStatusUpdate(BaseModel):
+    status: OrderStatus
+
+
+class OrderProductOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    brand: str
+    image_url: str | None
+
+
+class OrderVariantOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    size: str
+    color: str
+    product: OrderProductOut
+
+
+class OrderItemOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    quantity: int
+    unit_price: Decimal
+    variant: OrderVariantOut
+
+
+class OrderUserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    email: EmailStr
+
+
+class OrderOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    status: OrderStatus
+    total: Decimal
+    created_at: datetime
+    user: OrderUserOut
+    items: list[OrderItemOut]
+
+
+class OrderPage(BaseModel):
+    items: list[OrderOut]
     total: int
     limit: int
     offset: int
