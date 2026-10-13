@@ -59,12 +59,21 @@ class User(Base):
     orders: Mapped[list["Order"]] = relationship(back_populates="user")
 
 
+class OrderStatus(str, enum.Enum):
+    PENDING = "pending"
+    PAID = "paid"
+    SHIPPED = "shipped"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
+
+
 class Order(Base):
     __tablename__ = "orders"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    status: Mapped[str] = mapped_column(String(20), default="pending")
+    # one of OrderStatus's values, stored as plain text
+    status: Mapped[str] = mapped_column(String(20), default=OrderStatus.PENDING.value)
     total: Mapped[Decimal] = mapped_column(Numeric(10, 2))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
