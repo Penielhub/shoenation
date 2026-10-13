@@ -1,27 +1,27 @@
 import { createTheme } from "@mui/material/styles";
 const theme = createTheme({
   typography: {
-    fontFamily: "Lato, sans-serif",
+    fontFamily: "Inter, sans-serif",
   },
   h1: {
-    fontFamily: "Lato, sans-serif",
+    fontFamily: "Inter, sans-serif",
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          fontSize:"12px",
-          fontFamily: "Lato, sans-serif",
+          fontSize:"14px",
+          fontFamily: "Inter, sans-serif",
           fontWeight: 400,
           textTransform: "none",
-          padding: "8px 32px",
+          padding: "6px 36px",
           backgroundColor: "white",
           borderRadius: "999px",
           color: "black",
           "&:hover": {
             backgroundColor: "rgb(255, 219, 48)",
           },
-          border: "0.5px black solid",
+          border: "0.8px black solid",
         },
       },
       defaultProps: {
