@@ -26,7 +26,7 @@ function Footer() {
           flexDirection: { xs: "column", md: "row" },
         }}
       >
-        <Box>
+        <Box sx={{mb:{xs:12,md:0}}}>
           <Typography sx={{ color: "white", fontSize: 24, fontWeight: 800 }}>
             Stay lit!
           </Typography>
@@ -58,9 +58,10 @@ function Footer() {
           sx={{
             ml: { md: "auto" },
             display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            gap: { xs: 2, md: 15 },
-            pr: { md: 15 },
+            flexDirection: "row",
+            gap: {xs: 15},
+            mr: {md: 15},
+            
           }}
         >
           <Box>
