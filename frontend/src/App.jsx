@@ -1,12 +1,14 @@
-import { Typography } from "@mui/material";
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import UnderConstruction from "./pages/UnderConstruction";
 import { RouterProvider } from "react-router-dom";
 import router from "./app/router.jsx";
+import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
 function App() {
   return (
-    <RouterProvider router={router}></RouterProvider>
+    <AuthProvider>
+      <CartProvider>
+        <RouterProvider router={router}></RouterProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 export default App;

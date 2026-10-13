@@ -2,6 +2,7 @@ import Box from "@mui/material/Box"
 import bgimage from "../../assets/jordenxspace.jpg"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
+import { Link } from "react-router-dom"
 function ColabSection(){
     return (<Box sx={{display:"flex", width:"100%", flexDirection:{xs:"column", md:"row"},border:"1.5px black solid"}}>
         <Box sx={{width:{xs:"100%",md:"50%"},backgroundImage:`url(${bgimage})`,backgroundRepeat:"no-repeat", backgroundPosition:"bottom", backgroundSize:"cover", height:{xs:200,sm:350,md:500}}}>
@@ -13,7 +14,7 @@ function ColabSection(){
             <Typography sx={{fontWeight:400, color:"white"}}>
                 Crossing fashion and function
             </Typography>
-            <Button sx={{mt:5}}>Explore collection</Button>
+            <Button sx={{mt:5}} component={Link} to="/shop?q=jordan">Explore collection</Button>
         </Box>
     </Box>)
 }
