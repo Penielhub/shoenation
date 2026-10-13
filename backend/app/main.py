@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .routers import auth, products, users
+
+# tables are created and changed by Alembic migrations, not here: run `alembic upgrade head`
 app = FastAPI()
 
 # lets frontend talk to backend
@@ -11,6 +14,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/products")
-def get_products():
-    return [{"id": 1, "name": "T-shirt", "price": 499}]
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(products.router)
