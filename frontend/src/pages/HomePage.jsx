@@ -4,7 +4,8 @@ import heroimg from "../assets/hero.jpg";
 import decor from "../assets/decor.svg";
 import AnnouncementBanner from "../components/AnnouncementBanner/AnnouncementBanner";
 import Footer from "../components/Footer/Footer";
-
+import ColabSection from "../components/ColabSection/ColabSection";
+import CrepsSquadSubscription from "../components/CrepsSquadSubscription/CrepsSquadSubscription";
 function HomePage() {
   return (
     <>
@@ -33,6 +34,8 @@ function HomePage() {
           }}
         ></Box>
       </Box>
+      <CrepsSquadSubscription></CrepsSquadSubscription>
+      <ColabSection></ColabSection>    
       <Footer></Footer>
     </>
   );

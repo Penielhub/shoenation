@@ -11,7 +11,9 @@ function AnnouncementBanner(props){
             justifyContent:"center",
             alignItems:"center",
             py:1.5,
-            fontSize: "13px"
+            fontSize: "13px",
+            fontWeight: 400,
+            color:"black"
         }}>
             {/* New shoes - who dis?! */}
             NEW SHOES - WHO DIS?!
