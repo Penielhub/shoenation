@@ -45,7 +45,7 @@ function Footer() {
               py: { xs: 2, md: 2.5 },
               pl: 4,
               borderRadius: 99,
-              fontFamily: "Lato, sans-serif",
+              fontFamily: "Inter, sans-serif",
               outline: "none",
               bgcolor: "black",
               fontSize: 16,
