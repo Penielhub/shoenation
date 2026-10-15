@@ -13,7 +13,7 @@ Browse every backend endpoint in Swagger UI, without installing or running anyth
 
 The docs can be read by anyone, but requests go to **your own** backend at `http://localhost:8000`:
 
-1. Start the backend (see the setup steps in `backend/`): `uvicorn app.main:app --reload`
+1. Set up and start the backend on your computer by following the **[backend setup guide](../../backend/README.md)** (about 10 minutes the first time).
 2. In Swagger UI, click **Authorize**, enter your email as `username` and your password.
 3. Open an endpoint, click **Try it out**, then **Execute**.
 

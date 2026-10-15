@@ -3,4 +3,5 @@
 
 ## API docs
 
-Browse the backend API in Swagger UI: [docs/api](docs/api/README.md)
+- **Read the API docs (Swagger UI), with no setup needed:** [docs/api](docs/api/README.md)
+- **Run the backend and its Swagger UI on your own computer:** [backend setup guide](backend/README.md)
