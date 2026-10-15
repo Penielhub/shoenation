@@ -1,13 +1,17 @@
 import Box from "@mui/material/Box";
 import Navbar from "../components/Navbar/Navbar";
-import heroimg from "../assets/bg3.jpg";
-import decor from "../assets/decor.svg";
+import heroimg from "../assets/bg10.jpg";
+import decor from "../assets/shoenation.svg";
 import AnnouncementBanner from "../components/AnnouncementBanner/AnnouncementBanner";
 import Footer from "../components/Footer/Footer";
 import ColabSection from "../components/ColabSection/ColabSection";
 import CrepsSquadSubscription from "../components/CrepsSquadSubscription/CrepsSquadSubscription";
 import ProductCarousel from "../components/ProductCarousel/ProductCarousel";
+import jordanspace from "../assets/jordenxspace.jpg"
 import { Typography } from "@mui/material";
+import offerimage from "../assets/offerimg2.jpg"
+import FeaturedSection from "../components/FeaturedSection/FeaturedSection";
+import canoe from "../assets/colab3.jpg"
 function HomePage() {
   return (
     <>
@@ -21,7 +25,8 @@ function HomePage() {
           backgroundSize: "cover",
         }}
       >
-        <AnnouncementBanner bgcolor="rgb(100, 211, 255)"></AnnouncementBanner>
+        {/* <AnnouncementBanner bgcolor="rgb(100, 211, 255)"></AnnouncementBanner> */}
+        <AnnouncementBanner bgcolor="black"></AnnouncementBanner>
         <Navbar></Navbar>
         <Box
           component="img"
@@ -37,9 +42,13 @@ function HomePage() {
         ></Box>
       </Box>
       <CrepsSquadSubscription></CrepsSquadSubscription>
-      <ColabSection></ColabSection>    
-      <Typography sx={{fontFamily:"Brzo-Basic, sans-serif", fontWeight:800,fontSize:70, pt:2}}>Shop merch</Typography>
+      <ColabSection title= "JORDANxShoenation" buttonContent="Explore collection" bgImage={jordanspace} description="Crossing fashion and function" descriptionColor="white"></ColabSection>    
+      <Typography sx={{fontFamily:"Brzo-Basic, sans-serif", fontWeight:800,fontSize:{xs:50,md:70}, pt:2}}>Shop merch</Typography>
       <ProductCarousel></ProductCarousel>
+      {/* <ColabSection title= "Explore the best offers" buttonContent="Explore offers" showDescription={false} color="rgb(172, 58, 58)" buttonMarginTop={2} imageOrientation="right" bgImage={offerimage}></ColabSection>  */}
+      <ColabSection title= "Explore the best offers" buttonContent="Explore offers" showDescription={false} color="rgb(189, 18, 18)" buttonMarginTop={2} imageOrientation="right" bgImage={offerimage}></ColabSection> 
+      <FeaturedSection></FeaturedSection> 
+      <ColabSection title= "ShoenationxCanoe" buttonContent="shop" bgImage={canoe} color="white" description="Push the boundaries of running" descriptionColor="black" textColor="black"></ColabSection>   
       <Footer></Footer>
     </>
   );

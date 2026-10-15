@@ -13,3 +13,9 @@ body{
   font-weight: 800;
   font-style:"normal"
 }
+@font-face {
+  font-family: "Brzo-Air";
+  src: url("./assets/BRZO-Air.otf") format("opentype");
+  font-weight: 800;
+  font-style:"normal"
+}

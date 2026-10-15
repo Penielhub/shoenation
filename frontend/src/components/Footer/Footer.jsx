@@ -48,9 +48,9 @@ function Footer() {
               fontFamily: "Inter, sans-serif",
               outline: "none",
               bgcolor: "black",
-              fontSize: 16,
+              fontSize: 14,
               color: "white",
-              fontWeight: 700,
+              fontWeight: 400,
             }}
           ></Box>
         </Box>

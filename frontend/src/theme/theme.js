@@ -2,6 +2,10 @@ import { createTheme } from "@mui/material/styles";
 const theme = createTheme({
   typography: {
     fontFamily: "Inter, sans-serif",
+    BrzoText:{
+      fontFamily: "Brzo-Air",
+      fontWeight: 800,
+    }
   },
   h1: {
     fontFamily: "Inter, sans-serif",
