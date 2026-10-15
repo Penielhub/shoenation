@@ -8,15 +8,28 @@ from sqlalchemy.orm import Session, selectinload
 
 from ..database import get_db
 from ..deps import require_admin
-from ..models import OrderItem, Product, ProductVariant
-from ..schemas import ProductCreate, ProductOut, ProductPage, ProductUpdate, VariantIn, VariantOut, VariantUpdate
+from ..models import Category, OrderItem, Product, ProductType, ProductVariant
+from ..schemas import (
+    CATEGORY_HELP,
+    PRODUCT_TYPE_HELP,
+    ProductCreate,
+    ProductOut,
+    ProductPage,
+    ProductUpdate,
+    VariantIn,
+    VariantOut,
+    VariantUpdate,
+    sale_price_problem,
+)
 
 router = APIRouter(prefix="/products", tags=["products"])
 
+# price sorts use current_price, so a shoe on sale sorts by the price customers actually pay
 SORTS = {
-    "price_asc": Product.price.asc(),
-    "price_desc": Product.price.desc(),
+    "price_asc": Product.current_price.asc(),
+    "price_desc": Product.current_price.desc(),
     "name": Product.name.asc(),
+    "newest": Product.created_at.desc().nulls_last(),
 }
 
 
@@ -57,11 +70,14 @@ def list_products(
     db: Session = Depends(get_db),
     q: str | None = Query(None, description="Search in name and brand"),
     brand: str | None = None,
-    min_price: Decimal | None = Query(None, ge=0),
-    max_price: Decimal | None = Query(None, ge=0),
+    category: Category | None = Query(None, description=CATEGORY_HELP),
+    product_type: ProductType | None = Query(None, description=PRODUCT_TYPE_HELP),
+    on_sale: bool | None = Query(None, description="true = only discounted products, false = only full price"),
+    min_price: Decimal | None = Query(None, ge=0, description="Compared with current_price (the sale price when on sale)"),
+    max_price: Decimal | None = Query(None, ge=0, description="Compared with current_price (the sale price when on sale)"),
     size: str | None = None,
     in_stock: bool = Query(False, description="Only products with stock left (in `size`, if given)"),
-    sort: Literal["price_asc", "price_desc", "name"] | None = None,
+    sort: Literal["price_asc", "price_desc", "name", "newest"] | None = None,
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):
@@ -70,10 +86,16 @@ def list_products(
         query = query.filter(Product.name.icontains(q, autoescape=True) | Product.brand.icontains(q, autoescape=True))
     if brand:
         query = query.filter(Product.brand.ilike(brand))
+    if category is not None:
+        query = query.filter(Product.category == category)
+    if product_type is not None:
+        query = query.filter(Product.product_type == product_type)
+    if on_sale is not None:
+        query = query.filter(Product.on_sale == on_sale)
     if min_price is not None:
-        query = query.filter(Product.price >= min_price)
+        query = query.filter(Product.current_price >= min_price)
     if max_price is not None:
-        query = query.filter(Product.price <= max_price)
+        query = query.filter(Product.current_price <= max_price)
 
     variant_conditions = []
     if size:
@@ -116,8 +138,17 @@ def create_product(data: ProductCreate, db: Session = Depends(get_db)):
 @router.patch("/{product_id}", response_model=ProductOut, dependencies=[Depends(require_admin)])
 def update_product(product_id: int, data: ProductUpdate, db: Session = Depends(get_db)):
     product = get_product_or_404(db, product_id)
-    for field, value in data.model_dump(exclude_unset=True).items():
+    changes = data.model_dump(exclude_unset=True)
+    if changes.get("on_sale") is False and "sale_price" not in changes:
+        # ending a sale drops the old sale price, so the admin doesn't have to send both
+        changes["sale_price"] = None
+    for field, value in changes.items():
         setattr(product, field, value)
+    # checked on the merged result: e.g. lowering price below an existing sale price is refused too
+    problem = sale_price_problem(product.price, product.on_sale, product.sale_price)
+    if problem:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=problem)
     db.commit()
     db.refresh(product)
     return product

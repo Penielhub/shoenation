@@ -85,8 +85,8 @@ def place_order(data: OrderCreate, db: Session = Depends(get_db), user: User = D
     for vid, qty in quantities.items():
         variant = variants[vid]
         variant.stock -= qty
-        # the price is copied from the database now, so later price changes don't alter this order
-        order.items.append(OrderItem(variant_id=vid, quantity=qty, unit_price=variant.product.price))
+        # the price paid (the sale price while on sale) is copied now, so later price changes don't alter this order
+        order.items.append(OrderItem(variant_id=vid, quantity=qty, unit_price=variant.product.current_price))
     order.total = sum(item.unit_price * item.quantity for item in order.items)
     db.add(order)
     db.commit()
