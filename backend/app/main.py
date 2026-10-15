@@ -4,7 +4,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from .routers import auth, orders, products, users
 
 # tables are created and changed by Alembic migrations, not here: run `alembic upgrade head`
-app = FastAPI()
+app = FastAPI(
+    title="Shoenation API",
+    version="1.0.0",
+    description=(
+        "Backend for the Shoenation sneaker shop: accounts with admin/user roles, "
+        "the product catalog, and orders.\n\n"
+        "**Signing in:** click **Authorize**, enter your email as `username` and your password. "
+        "Admin-only endpoints return 403 for regular users."
+    ),
+)
 
 # lets frontend talk to backend
 app.add_middleware(
