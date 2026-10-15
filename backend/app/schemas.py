@@ -1,9 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field, field_validator, model_validator
 
-from .models import OrderStatus, Role
+from .models import Category, OrderStatus, ProductType, Role
 
 
 class UserCreate(BaseModel):
@@ -62,13 +62,39 @@ class VariantOut(VariantIn):
     id: int
 
 
+def sale_price_problem(price: Decimal, on_sale: bool, sale_price: Decimal | None) -> str | None:
+    """The sale rules, shared by create and update. Mirrors the ck_products_sale_price_valid constraint."""
+    if on_sale and sale_price is None:
+        return "sale_price is required when on_sale is true"
+    if not on_sale and sale_price is not None:
+        return "sale_price can only be set when on_sale is true"
+    if on_sale and sale_price >= price:
+        return f"sale_price ({sale_price}) must be lower than price ({price})"
+    return None
+
+
+CATEGORY_HELP = "1 = men, 2 = women, 3 = kids, 4 = unisex"
+PRODUCT_TYPE_HELP = "1 = shoe, 2 = merch"
+
+
 class ProductCreate(BaseModel):
     name: str = Field(max_length=200)
     brand: str = Field(max_length=100)
     description: str | None = None
     price: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
     image_url: str | None = Field(default=None, max_length=500)
+    category: Category = Field(description=CATEGORY_HELP)
+    product_type: ProductType = Field(default=ProductType.SHOE, description=PRODUCT_TYPE_HELP)
+    on_sale: bool = False
+    sale_price: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
     variants: list[VariantIn] = []
+
+    @model_validator(mode="after")
+    def check_sale(self):
+        problem = sale_price_problem(self.price, self.on_sale, self.sale_price)
+        if problem:
+            raise ValueError(problem)
+        return self
 
     @field_validator("variants")
     @classmethod
@@ -87,8 +113,12 @@ class ProductUpdate(BaseModel):
     description: str | None = None
     price: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
     image_url: str | None = Field(default=None, max_length=500)
+    category: Category | None = Field(default=None, description=CATEGORY_HELP)
+    product_type: ProductType | None = Field(default=None, description=PRODUCT_TYPE_HELP)
+    on_sale: bool | None = Field(default=None, description="Setting this to false also clears sale_price")
+    sale_price: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
 
-    @field_validator("name", "brand", "price")
+    @field_validator("name", "brand", "price", "category", "product_type", "on_sale")
     @classmethod
     def not_null(cls, v):
         if v is None:
@@ -105,7 +135,20 @@ class ProductOut(BaseModel):
     description: str | None
     price: Decimal
     image_url: str | None
+    category: Category
+    product_type: ProductType
+    on_sale: bool
+    sale_price: Decimal | None
+    current_price: Decimal = Field(description="What a customer pays now: sale_price while on sale, else price")
     variants: list[VariantOut]
+
+    @computed_field
+    @property
+    def discount_percent(self) -> int | None:
+        """Rounded percentage off, for a "-20%" badge. None when not on sale."""
+        if not self.on_sale or self.sale_price is None:
+            return None
+        return round((self.price - self.sale_price) / self.price * 100)
 
 
 class ProductPage(BaseModel):
