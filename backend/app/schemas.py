@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field, field_validator, model_validator
 
-from .models import Category, OrderStatus, ProductType, Role
+from .models import Category, Gender, OrderStatus, ProductType, Role
 
 
 class UserCreate(BaseModel):
@@ -73,7 +73,8 @@ def sale_price_problem(price: Decimal, on_sale: bool, sale_price: Decimal | None
     return None
 
 
-CATEGORY_HELP = "1 = men, 2 = women, 3 = kids, 4 = unisex"
+CATEGORY_HELP = "1 = men, 2 = women, 3 = kids, 4 = unisex. Set automatically from gender + is_kids"
+GENDER_HELP = "1 = male, 2 = female, 3 = unisex (kids' shoes too: boys', girls', unisex)"
 PRODUCT_TYPE_HELP = "1 = shoe, 2 = merch"
 
 
@@ -83,7 +84,8 @@ class ProductCreate(BaseModel):
     description: str | None = None
     price: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
     image_url: str | None = Field(default=None, max_length=500)
-    category: Category = Field(description=CATEGORY_HELP)
+    gender: Gender = Field(description=GENDER_HELP)
+    is_kids: bool = False
     product_type: ProductType = Field(default=ProductType.SHOE, description=PRODUCT_TYPE_HELP)
     on_sale: bool = False
     sale_price: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
@@ -113,12 +115,13 @@ class ProductUpdate(BaseModel):
     description: str | None = None
     price: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
     image_url: str | None = Field(default=None, max_length=500)
-    category: Category | None = Field(default=None, description=CATEGORY_HELP)
+    gender: Gender | None = Field(default=None, description=GENDER_HELP)
+    is_kids: bool | None = None
     product_type: ProductType | None = Field(default=None, description=PRODUCT_TYPE_HELP)
     on_sale: bool | None = Field(default=None, description="Setting this to false also clears sale_price")
     sale_price: Decimal | None = Field(default=None, gt=0, max_digits=10, decimal_places=2)
 
-    @field_validator("name", "brand", "price", "category", "product_type", "on_sale")
+    @field_validator("name", "brand", "price", "gender", "is_kids", "product_type", "on_sale")
     @classmethod
     def not_null(cls, v):
         if v is None:
@@ -135,7 +138,9 @@ class ProductOut(BaseModel):
     description: str | None
     price: Decimal
     image_url: str | None
-    category: Category
+    gender: Gender
+    is_kids: bool
+    category: Category = Field(description=CATEGORY_HELP)
     product_type: ProductType
     on_sale: bool
     sale_price: Decimal | None

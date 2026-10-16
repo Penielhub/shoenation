@@ -14,6 +14,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     case,
+    event,
     false,
     func,
     text,
@@ -33,6 +34,21 @@ class Category(enum.IntEnum):
     UNISEX = 4
 
 
+class Gender(enum.IntEnum):
+    """Stored as a small integer in products.gender. Kids' shoes have a gender too (boys', girls', unisex)."""
+
+    MALE = 1
+    FEMALE = 2
+    UNISEX = 3
+
+
+def category_for(gender: int, is_kids: bool) -> "Category":
+    """category is derived from gender + is_kids; ck_products_category_matches enforces the same rule."""
+    if is_kids:
+        return Category.KIDS
+    return {Gender.MALE: Category.MEN, Gender.FEMALE: Category.WOMEN, Gender.UNISEX: Category.UNISEX}[Gender(gender)]
+
+
 class ProductType(enum.IntEnum):
     """Stored as a small integer in products.product_type."""
 
@@ -45,6 +61,12 @@ class Product(Base):
     # the database itself refuses bad data, even if it's written by something other than this API
     __table_args__ = (
         CheckConstraint("category IN (1, 2, 3, 4)", name="ck_products_category_valid"),
+        CheckConstraint("gender IN (1, 2, 3)", name="ck_products_gender_valid"),
+        CheckConstraint(
+            "(is_kids AND category = 3)"
+            " OR (NOT is_kids AND category = CASE gender WHEN 1 THEN 1 WHEN 2 THEN 2 ELSE 4 END)",
+            name="ck_products_category_matches",
+        ),
         CheckConstraint("product_type IN (1, 2)", name="ck_products_product_type_valid"),
         CheckConstraint("price > 0", name="ck_products_price_positive"),
         CheckConstraint(
@@ -61,8 +83,11 @@ class Product(Base):
     price: Mapped[Decimal] = mapped_column(Numeric(10, 2))
     image_url: Mapped[str | None] = mapped_column(String(500))
     created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    # one of Category's values; existing rows were backfilled as unisex
+    # one of Category's values. Derived from gender + is_kids (see _sync_category), kept for simple filtering
     category: Mapped[int] = mapped_column(SmallInteger, index=True, server_default=text(str(Category.UNISEX.value)))
+    # one of Gender's values
+    gender: Mapped[int] = mapped_column(SmallInteger, index=True)
+    is_kids: Mapped[bool] = mapped_column(Boolean, index=True, server_default=false())
     # one of ProductType's values
     product_type: Mapped[int] = mapped_column(SmallInteger, index=True, server_default=text(str(ProductType.SHOE.value)))
     on_sale: Mapped[bool] = mapped_column(Boolean, index=True, server_default=false())
@@ -81,6 +106,13 @@ class Product(Base):
     def _current_price_expression(cls):
         # the same rule in SQL, so filters and sorting use the price customers actually pay
         return case((cls.on_sale, cls.sale_price), else_=cls.price)
+
+
+@event.listens_for(Product, "before_insert")
+@event.listens_for(Product, "before_update")
+def _sync_category(mapper, connection, product: Product):
+    # nobody sets category by hand: it always follows gender + is_kids
+    product.category = category_for(product.gender, bool(product.is_kids))
 
 
 class ProductVariant(Base):

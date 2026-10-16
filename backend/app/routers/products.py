@@ -8,9 +8,10 @@ from sqlalchemy.orm import Session, selectinload
 
 from ..database import get_db
 from ..deps import require_admin
-from ..models import Category, OrderItem, Product, ProductType, ProductVariant
+from ..models import Category, Gender, OrderItem, Product, ProductType, ProductVariant
 from ..schemas import (
     CATEGORY_HELP,
+    GENDER_HELP,
     PRODUCT_TYPE_HELP,
     ProductCreate,
     ProductOut,
@@ -71,6 +72,8 @@ def list_products(
     q: str | None = Query(None, description="Search in name and brand"),
     brand: str | None = None,
     category: Category | None = Query(None, description=CATEGORY_HELP),
+    gender: Gender | None = Query(None, description=GENDER_HELP),
+    is_kids: bool | None = Query(None, description="true = only kids' shoes, false = only adults'"),
     product_type: ProductType | None = Query(None, description=PRODUCT_TYPE_HELP),
     on_sale: bool | None = Query(None, description="true = only discounted products, false = only full price"),
     min_price: Decimal | None = Query(None, ge=0, description="Compared with current_price (the sale price when on sale)"),
@@ -88,6 +91,10 @@ def list_products(
         query = query.filter(Product.brand.ilike(brand))
     if category is not None:
         query = query.filter(Product.category == category)
+    if gender is not None:
+        query = query.filter(Product.gender == gender)
+    if is_kids is not None:
+        query = query.filter(Product.is_kids == is_kids)
     if product_type is not None:
         query = query.filter(Product.product_type == product_type)
     if on_sale is not None:
