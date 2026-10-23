@@ -12,7 +12,7 @@ import SvgIcon from "@mui/material/SvgIcon";
 import ham from "../../assets/ham.svg";
 import { useState } from "react";
 import { Drawer } from "@mui/material";
-function Navbar() {
+function Navbar({sx={}}) {
   const [open, setOpen] = useState(false);
   const btnData = ["SALE", "Men", "Women", "Kids"];
   return (
@@ -21,6 +21,7 @@ function Navbar() {
       sx={{
         bgcolor: "transparent",
         boxShadow: "none",
+        ...sx
       }}
     >
       <Toolbar

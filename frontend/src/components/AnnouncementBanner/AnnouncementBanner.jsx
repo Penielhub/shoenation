@@ -10,11 +10,11 @@ function AnnouncementBanner(props){
             display:"flex",
             justifyContent:"center",
             alignItems:"center",
-            py:1.5,
-            fontSize: "13px",
+            py:2,
+            fontSize: "11px",
             fontWeight: 400,
             color:"white",
-            borderBottom:"0.5px solid white"
+            borderBottom:"0.3px solid white"
         }}>
             {/* New shoes - who dis?! */}
             NEW SHOES - WHO DIS?!

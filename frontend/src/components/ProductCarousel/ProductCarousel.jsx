@@ -6,6 +6,7 @@ import nikecap1 from "../../assets/cap.jpg"
 import nikecap2 from "../../assets/cap2.jpg"
 import nikebag1 from "../../assets/nikebag2.jpg"
 import blacktee from "../../assets/blacktee.jpg"
+
 function ProductCarousel(props){
     const products= [{
         id:"totebag",
@@ -42,7 +43,9 @@ function ProductCarousel(props){
         price:"Rs. 570",
         title:"ShoeNation club tee",
         image: blacktee
-    }
+    },
+    
+    
     ]
     return (    
         <Box sx={{display:"flex", overflowX:"auto", scrollbarWidth:"none"}}>

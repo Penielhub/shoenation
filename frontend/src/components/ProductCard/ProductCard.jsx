@@ -23,10 +23,10 @@ function ProductCard(props) {
       <Button sx={{borderRadius:99, position:"absolute",top:"3%",right:"3%",px:1, py:2, minWidth: 36,height: 36,}}>
             <Box component="img" src={heart} alt="" sx={{width:18, height:18}}></Box>
         </Button>
-      <Typography sx={{ fontWeight: 800, fontSize: 18, mt: 2 }}>
+      <Typography sx={{ fontWeight: 800, fontSize: 18, mt: 2, mb:1 }}>
         {props.productTitle}
       </Typography>
-      <Button sx={{ mt: 3 }}>Add to cart</Button>
+      <Button sx={{ marginTop:"auto" }}>Add to cart</Button>
     </Box>
   );
 }
